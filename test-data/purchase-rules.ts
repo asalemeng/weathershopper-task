@@ -23,7 +23,7 @@ export const PURCHASE_RULES = {
   },
 } as const satisfies Record<string, ProductRequirement>;
 
-/** The rules grouped by the department that fulfils them. */
+//The ruls grouped by the department that fulfils them.
 export const RULES_BY_CATEGORY = {
   moisturizer: [PURCHASE_RULES.aloe, PURCHASE_RULES.almond],
   sunscreen: [PURCHASE_RULES.spf50, PURCHASE_RULES.spf30],

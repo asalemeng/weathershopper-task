@@ -97,6 +97,9 @@ export class ProductListPage extends BasePage {
     return purchased;
   }
   async openCart(): Promise<void> {
+    // the app updates the cart with JS after each Add; clicking while the
+    // button still says "Empty" does nothing and the test never leaves the page
+    await expect(this.cartButton, 'cart never registered the added items').not.toHaveText(/empty/i);
     await this.cartButton.click();
   }
 }

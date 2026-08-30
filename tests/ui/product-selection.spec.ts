@@ -13,7 +13,11 @@ for (const requirement of Object.values(PURCHASE_RULES)) {
       const products = await listPage.listProducts();
       const matches = filterMatching(products, requirement);
 
-      expect(matches.length, `no product matches ${requirement.pattern}`).toBeGreaterThan(0);
+      expect(
+        matches.length,
+        `no product matches ${requirement.pattern}. ` +
+          `Page offered: ${products.map((p) => p.name).join(' | ')}`,
+      ).toBeGreaterThan(0);
 
       // Nothing matching the rule may be cheaper than the product we would pick.
       const chosen = cheapestMatching(products, requirement);

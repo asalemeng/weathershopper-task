@@ -7,7 +7,8 @@ export class PaymentConfirmationPage {
   private readonly message: Locator;
 
   constructor(page: Page) {
-    this.message = page.getByText(/payment (success|failure)/i).first();
+    // the app's two outcome headings are "PAYMENT SUCCESS" and "PAYMENT FAILED"
+    this.message = page.getByText(/payment (success|failed)/i).first();
   }
 
   async assertPaymentSuccess(): Promise<void> {

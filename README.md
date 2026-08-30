@@ -29,16 +29,16 @@ Useful scripts:
 
 ## Structure
 
-- `pages/` – page objects, one class per page, handed out by the PageObjectManager
-- `tests/ui/` – the Playwright tests
-- `tests/unit/` – unit tests for the pure logic (price parsing, cheapest-product
+- pages/ :page objects, one class per page, controlled out by the PageObjectManager
+- tests/ui/: the Playwright tests
+- tests/unit/ : unit tests for the pure logic (price parsing, cheapest-product
   selection, temperature rule)
-- `test-data/` – purchase rules, card data, catalogues for the unit tests
-- `utils/`, `models/` – shared helpers and types
+- test-data/ : purchase rules, card data, catalogues for the unit tests
+- utils/, models/ :shared helpers and types
 
 ## Notes and decisions
 
-- Nothing is hard-coded to a temperature. The test reads the value on screen and
+- Nothing is hardcoded to a temperature. The test reads the value on screen and
   applies the same rule the app states in its tooltip, so it works on both branches.
 - Product selection is a pure function, so the tricky cases (SPF-500 vs SPF-50,
   mixed-case names, price ties) are unit tested without a browser.
@@ -46,3 +46,28 @@ Useful scripts:
   parser anchors on the "Price" label every card has.
 - Card details default to Stripe's 4242 test card; override with CARD_EMAIL,
   CARD_NUMBER, CARD_EXPIRY, CARD_CVC env vars if needed.
+
+## My observations
+
+- The prices formatted not in the same way example Price: 'Rs. 215' on some cards and 'Price:220' on others.
+
+- Add buttons are clickable for seconds before their handler exist
+  i fix it by using 'ProductListPage.expectLoaded()' which wait for the load event.
+
+- The cart page tooltip admits "the payment screen will error 5% of the time by design".
+  I stress-tested the checkout journey with `--repeat-each=30` and the failure rate matched.
+  The failure page heading is "PAYMENT FAILED" (not "payment failure"), so the
+  confirmation locator matches both outcomes and the journey test has 2 scoped retries
+  to absorb the designed randomness - a real bug would still fail all 3 attempts.
+
+- Right after clicking Add, the cart button still says "Cart - Empty" for a moment
+  while the app's JS catches up. Clicking it in that window does nothing and the test
+  stays on the product page. `openCart()` now waits until the button stops saying
+  "Empty" before clicking.
+
+- In one run out of ~70 the sunscreen page listed no SPF-50 product at all. I could
+  not reproduce it, so the "no match" assertion now prints every product name the
+  page offered - if it happens again, the failure will explain itself.
+
+- GET /confirmation returns 405: the confirmation page only exists as the response
+  to the payment POST, which is why its page object has no open() method.
